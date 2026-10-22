@@ -140,7 +140,7 @@ def main():
     if not token:
         raise SystemExit("Set GITHUB_TOKEN first (locally: $env:GITHUB_TOKEN = gh auth token)")
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(build_svg(fetch_calendar(token)), encoding="utf-8")
+    OUT.write_text(build_svg(fetch_calendar(token)), encoding="utf-8", newline="\n")
     print(f"Wrote {OUT}")
 
 
