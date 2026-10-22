@@ -27,7 +27,7 @@ jobs:
 
       - name: Commit if changed
         run: |
-          git add assets/contributions.svg
+          git add assets README.md
           if git diff --cached --quiet; then
             echo "No changes"
             exit 0
