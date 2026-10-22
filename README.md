@@ -4,8 +4,8 @@
 
 **Software Engineer · AI & Machine Learning · Computer Science @ UFPE**
 
-<a href="https://www.linkedin.com/in/YOUR-LINKEDIN"><img src="https://img.shields.io/badge/LinkedIn-0d1117?style=for-the-badge&logo=linkedin&logoColor=39ff14" alt="LinkedIn" /></a>
-<a href="mailto:YOUR-EMAIL"><img src="https://img.shields.io/badge/Email-0d1117?style=for-the-badge&logo=gmail&logoColor=39ff14" alt="Email" /></a>
+<a href="https://www.linkedin.com/in/YOUR-LINKEDIN"><img src="https://img.shields.io/badge/LinkedIn-0969da?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>
+<a href="mailto:YOUR-EMAIL"><img src="https://img.shields.io/badge/Email-0969da?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
 
 </div>
 
