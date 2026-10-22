@@ -1,16 +1,15 @@
-## Hi there 👋
+# Guilherme Valença Saunders
 
-<!--
-**GuilhermeSaunders/GuilhermeSaunders** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+Computer Science student at UFPE and Software Manager at CITi.
+Interested in backend development and quantitative finance.
 
-Here are some ideas to get you started:
+### Links
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+<a href="https://www.linkedin.com/in/YOUR-LINKEDIN"><img src="https://img.shields.io/badge/LinkedIn-0d1117?style=flat&logo=linkedin&logoColor=39ff14" alt="LinkedIn" /></a>
+<a href="mailto:YOUR-EMAIL"><img src="https://img.shields.io/badge/Email-0d1117?style=flat&logo=gmail&logoColor=39ff14" alt="Email" /></a>
+
+### Stack
+
+<p>
+  <img src="https://skillicons.dev/icons?i=python,ts,nodejs,postgres,docker,git,linux" alt="Python, TypeScript, Node.js, PostgreSQL, Docker, Git, Linux" />
+</p>
