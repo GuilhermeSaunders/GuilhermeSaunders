@@ -7,7 +7,7 @@ and rewrites the block between the heatmap markers in README.md (one <details> p
 
 Usage (PowerShell):
     $env:GITHUB_TOKEN = gh auth token
-    python scripts/generate_heatmap.py              # theme from HEATMAP_THEME, default "green"
+    python scripts/generate_heatmap.py              # theme from HEATMAP_THEME, default "light-blue"
     python scripts/generate_heatmap.py --preview    # every theme into preview/ (git-ignored)
 
 Needs only the standard library. The token is read from GITHUB_TOKEN and never written anywhere.
@@ -70,6 +70,15 @@ THEMES = {
         "accent": "#b388ff",
         "border": "#2e2347",
     },
+    "light-blue": {
+        "rest": ["#ebedf0", "#b6d4fe", "#6ea8fe", "#2f7cf6", "#0b4fc4"],
+        "peak": ["#9ec5fe", "#3b8cff", "#1a6cf0", "#0b55d0", "#05348a"],
+        "accent": "#0969da",
+        "border": "#d0d7de",
+        "bg": "#ffffff",
+        "text": "#57606a",
+        "glow": False,
+    },
     "amber": {
         "rest": ["#161b22", "#5c3b06", "#a86a0a", "#f0a020", "#ffcc4d"],
         "peak": ["#8a5a10", "#ffcc4d", "#ffd970", "#ffe7a3", "#fff4d6"],
@@ -115,7 +124,7 @@ def month_labels(weeks):
 
 
 def build_svg(calendar, command, period, theme):
-    t = THEMES[theme]
+    t = {"bg": "#0d1117", "text": "#8b949e", "glow": True, **THEMES[theme]}
     weeks = calendar["weeks"]
     total = calendar["totalContributions"]
     width = LEFT + len(weeks) * PITCH - GAP + RIGHT
@@ -124,7 +133,7 @@ def build_svg(calendar, command, period, theme):
     font = "ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
 
     css = [
-        f"text{{font-family:{font};fill:#8b949e;font-size:11px}}",
+        f"text{{font-family:{font};fill:{t['text']};font-size:11px}}",
         f".title{{fill:{t['accent']};font-size:14px;font-weight:700}}",
         f".d{{animation:{WAVE_SECONDS}s ease-in-out infinite both;"
         "transform-box:fill-box;transform-origin:center}",
@@ -162,15 +171,16 @@ def build_svg(calendar, command, period, theme):
         for i, rest in enumerate(t["rest"])
     )
     updated = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    glow = ' filter="url(#glow)"' if t["glow"] else ""
 
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-label="{total} GitHub contributions {period}">
 <style>{''.join(css)}</style>
 <defs><filter id="glow" x="-5%" y="-20%" width="110%" height="140%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<rect x="0.5" y="0.5" width="{width - 1}" height="{height - 1}" rx="10" fill="#0d1117" stroke="{t['border']}"/>
+<rect x="0.5" y="0.5" width="{width - 1}" height="{height - 1}" rx="10" fill="{t['bg']}" stroke="{t['border']}"/>
 <text class="title" x="{LEFT}" y="32">$ {command}</text>
 <text x="{width - RIGHT}" y="32" text-anchor="end"><tspan fill="{t['accent']}" font-weight="700">{total}</tspan> contributions {period}</text>
 {months}{weekdays}
-<g filter="url(#glow)">{''.join(cells)}</g>
+<g{glow}>{''.join(cells)}</g>
 <text x="{LEFT}" y="{legend_y + 10}">updated {updated}</text>
 <text x="{legend_x - 8}" y="{legend_y + 10}" text-anchor="end">Less</text>{legend}<text x="{legend_x + 5 * PITCH + 3}" y="{legend_y + 10}">More</text>
 </svg>
@@ -245,7 +255,7 @@ def main():
         write(PREVIEW / "index.html", preview_page(last_year, command, period))
         return
 
-    theme = os.environ.get("HEATMAP_THEME", "green")
+    theme = os.environ.get("HEATMAP_THEME", "light-blue")
     write(ASSETS / "contributions.svg", build_svg(last_year, command, period, theme))
 
     years = sorted(rolling["contributionYears"], reverse=True)
