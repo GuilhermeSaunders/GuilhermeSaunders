@@ -54,11 +54,11 @@ THEMES = {
         "rest": ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"],
         "peak": ["#9be9a8", "#40c463", "#30a14e", "#216e39", "#0f4d24"],
         "accent": "#1a7f37",
-        "border": "#4ac26b",
+        "border": "#1f2328",
         "bg": "#ffffff",
         "text": "#57606a",
         "glow": False,
-        "frame": "#d0d7de",
+        "frame": "#1f2328",
         "cell_stroke": "rgba(31,35,40,0.10)",
     },
     "light-blue": {
