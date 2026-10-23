@@ -11,8 +11,10 @@ Needs only the standard library. The token is read from GITHUB_TOKEN and never w
 """
 
 import base64
+import hashlib
 import json
 import os
+import re
 import sys
 import urllib.request
 from datetime import date, datetime, timezone
@@ -22,6 +24,7 @@ LOGIN = os.environ.get("GITHUB_USER", "GuilhermeSaunders")
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets" / "contributions.svg"
 OUT_ACTIVITY = ROOT / "assets" / "activity.svg"
+README = ROOT / "README.md"
 PREVIEW = ROOT / "preview"
 
 QUERY = """
@@ -106,8 +109,8 @@ CELL, GAP = 12, 3
 PITCH = CELL + GAP
 LEFT, TOP, RIGHT = 48, 78, 28
 FRAME_PAD = 7  # space between the inner frame and the cells
-WAVE_SECONDS = 4.5
-WAVE_STEP = 0.045  # delay between neighbouring columns
+WAVE_SECONDS = 8
+WAVE_STEP = 0.09  # delay between neighbouring columns
 
 
 def fetch_collection(token):
@@ -324,6 +327,17 @@ def main():
     theme = os.environ.get("HEATMAP_THEME", "light-green")
     write(OUT, build_svg(calendar, theme))
     write(OUT_ACTIVITY, build_activity_svg(collection, theme))
+    version_image_links()
+
+
+def version_image_links():
+    """Point README at ?v=<content hash> so browsers never show a cached old card."""
+    text = README.read_text(encoding="utf-8")
+    for path in (OUT, OUT_ACTIVITY):
+        version = hashlib.sha1(path.read_bytes()).hexdigest()[:8]
+        pattern = re.compile(rf'assets/{re.escape(path.name)}(\?v=[0-9a-f]+)?"')
+        text = pattern.sub(f'assets/{path.name}?v={version}"', text)
+    write(README, text)
 
 
 if __name__ == "__main__":

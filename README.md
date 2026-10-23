@@ -26,9 +26,9 @@ Feel free to explore my profile and some of my work.
 
 <div align="center">
 
-<img src="assets/contributions.svg" alt="GitHub contribution heatmap, last 12 months" width="100%" />
+<img src="assets/contributions.svg?v=a9864c6b" alt="GitHub contribution heatmap, last 12 months" width="100%" />
 
-<img src="assets/activity.svg" alt="Activity overview: commits, pull requests, issues and code review" width="100%" />
+<img src="assets/activity.svg?v=c74b6617" alt="Activity overview: commits, pull requests, issues and code review" width="100%" />
 
 </div>
 
