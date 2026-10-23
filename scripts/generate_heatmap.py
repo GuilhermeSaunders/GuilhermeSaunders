@@ -4,7 +4,7 @@
 
 Usage (PowerShell):
     $env:GITHUB_TOKEN = gh auth token
-    python scripts/generate_heatmap.py              # theme from HEATMAP_THEME, default "light-blue"
+    python scripts/generate_heatmap.py              # theme from HEATMAP_THEME, default "light-green"
     python scripts/generate_heatmap.py --preview    # every theme into preview/ (git-ignored)
 
 Needs only the standard library. The token is read from GITHUB_TOKEN and never written anywhere.
@@ -47,6 +47,17 @@ LEVEL_KEYS = ["NONE", "FIRST_QUARTILE", "SECOND_QUARTILE", "THIRD_QUARTILE", "FO
 # Per theme: resting colour and wave-peak colour for each level, plus card colours.
 # Optional keys: bg, text, glow, frame (inner border around the grid), cell_stroke (outline of each day).
 THEMES = {
+    "light-green": {  # GitHub's classic contribution colours
+        "rest": ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"],
+        "peak": ["#9be9a8", "#40c463", "#30a14e", "#216e39", "#0f4d24"],
+        "accent": "#1a7f37",
+        "border": "#4ac26b",
+        "bg": "#ffffff",
+        "text": "#57606a",
+        "glow": False,
+        "frame": "#d0d7de",
+        "cell_stroke": "rgba(31,35,40,0.10)",
+    },
     "light-blue": {
         "rest": ["#ebedf0", "#b6d4fe", "#6ea8fe", "#2f7cf6", "#0b4fc4"],
         "peak": ["#9ec5fe", "#3b8cff", "#1a6cf0", "#0b55d0", "#05348a"],
@@ -310,7 +321,7 @@ def main():
         write(PREVIEW / "index.html", preview_page(calendar))
         return
 
-    theme = os.environ.get("HEATMAP_THEME", "light-blue")
+    theme = os.environ.get("HEATMAP_THEME", "light-green")
     write(OUT, build_svg(calendar, theme))
     write(OUT_ACTIVITY, build_activity_svg(collection, theme))
 
