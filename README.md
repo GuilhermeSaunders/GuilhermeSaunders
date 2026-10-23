@@ -30,24 +30,11 @@ building systems that are reliable in production, not just in a notebook. On the
 
 <br />
 
-<!-- heatmap:start -->
 <div align="center">
 
 <img src="assets/contributions.svg" alt="GitHub contribution heatmap, last 12 months" width="100%" />
 
-<details><summary><b>2026</b></summary><br />
-
-<img src="assets/contributions-2026.svg" alt="GitHub contribution heatmap, 2026" width="100%" />
-
-</details>
-<details><summary><b>2025</b></summary><br />
-
-<img src="assets/contributions-2025.svg" alt="GitHub contribution heatmap, 2025" width="100%" />
-
-</details>
-
 </div>
-<!-- heatmap:end -->
 
 ### Stack
 

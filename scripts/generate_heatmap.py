@@ -1,9 +1,4 @@
-"""Generate neon contribution heatmaps with a wave animation.
-
-Writes:
-    assets/contributions.svg        last 12 months (like the default GitHub graph)
-    assets/contributions-YYYY.svg   one per calendar year with contributions
-and rewrites the block between the heatmap markers in README.md (one <details> per year).
+"""Generate assets/contributions.svg: a contribution heatmap of the last 12 months with a wave animation.
 
 Usage (PowerShell):
     $env:GITHUB_TOKEN = gh auth token
@@ -16,7 +11,6 @@ Needs only the standard library. The token is read from GITHUB_TOKEN and never w
 import base64
 import json
 import os
-import re
 import sys
 import urllib.request
 from datetime import date, datetime, timezone
@@ -24,15 +18,13 @@ from pathlib import Path
 
 LOGIN = os.environ.get("GITHUB_USER", "GuilhermeSaunders")
 ROOT = Path(__file__).resolve().parent.parent
-ASSETS = ROOT / "assets"
-README = ROOT / "README.md"
+OUT = ROOT / "assets" / "contributions.svg"
 PREVIEW = ROOT / "preview"
 
-CALENDAR_QUERY = """
-query($login: String!, $from: DateTime, $to: DateTime) {
+QUERY = """
+query($login: String!) {
   user(login: $login) {
-    contributionsCollection(from: $from, to: $to) {
-      contributionYears
+    contributionsCollection {
       contributionCalendar {
         totalContributions
         weeks { contributionDays { date weekday contributionCount contributionLevel } }
@@ -44,8 +36,20 @@ query($login: String!, $from: DateTime, $to: DateTime) {
 
 LEVEL_KEYS = ["NONE", "FIRST_QUARTILE", "SECOND_QUARTILE", "THIRD_QUARTILE", "FOURTH_QUARTILE"]
 
-# Per theme: resting colour and wave-peak colour for each level, plus accent and border.
+# Per theme: resting colour and wave-peak colour for each level, plus card colours.
+# Optional keys: bg, text, glow, frame (inner border around the grid), cell_stroke (outline of each day).
 THEMES = {
+    "light-blue": {
+        "rest": ["#ebedf0", "#b6d4fe", "#6ea8fe", "#2f7cf6", "#0b4fc4"],
+        "peak": ["#9ec5fe", "#3b8cff", "#1a6cf0", "#0b55d0", "#05348a"],
+        "accent": "#0969da",
+        "border": "#54aeff",
+        "bg": "#ffffff",
+        "text": "#57606a",
+        "glow": False,
+        "frame": "#d0d7de",
+        "cell_stroke": "rgba(31,35,40,0.10)",
+    },
     "green": {
         "rest": ["#161b22", "#0f5a24", "#17a83a", "#2bd94f", "#39ff14"],
         "peak": ["#1f9a3a", "#39ff14", "#6dff4f", "#a6ff8f", "#d4ffc9"],
@@ -70,15 +74,6 @@ THEMES = {
         "accent": "#b388ff",
         "border": "#2e2347",
     },
-    "light-blue": {
-        "rest": ["#ebedf0", "#b6d4fe", "#6ea8fe", "#2f7cf6", "#0b4fc4"],
-        "peak": ["#9ec5fe", "#3b8cff", "#1a6cf0", "#0b55d0", "#05348a"],
-        "accent": "#0969da",
-        "border": "#d0d7de",
-        "bg": "#ffffff",
-        "text": "#57606a",
-        "glow": False,
-    },
     "amber": {
         "rest": ["#161b22", "#5c3b06", "#a86a0a", "#f0a020", "#ffcc4d"],
         "peak": ["#8a5a10", "#ffcc4d", "#ffd970", "#ffe7a3", "#fff4d6"],
@@ -86,19 +81,18 @@ THEMES = {
         "border": "#3d2e12",
     },
 }
+THEME_DEFAULTS = {"bg": "#0d1117", "text": "#8b949e", "glow": True, "frame": None, "cell_stroke": None}
 
 CELL, GAP = 12, 3
 PITCH = CELL + GAP
-LEFT, TOP, RIGHT = 40, 70, 24
+LEFT, TOP, RIGHT = 48, 78, 28
+FRAME_PAD = 7  # space between the inner frame and the cells
 WAVE_SECONDS = 4.5
 WAVE_STEP = 0.045  # delay between neighbouring columns
 
-MARK_START, MARK_END = "<!-- heatmap:start -->", "<!-- heatmap:end -->"
 
-
-def fetch_collection(token, start=None, end=None):
-    variables = {"login": LOGIN, "from": start, "to": end}
-    body = json.dumps({"query": CALENDAR_QUERY, "variables": variables}).encode()
+def fetch_calendar(token):
+    body = json.dumps({"query": QUERY, "variables": {"login": LOGIN}}).encode()
     req = urllib.request.Request(
         "https://api.github.com/graphql",
         data=body,
@@ -108,7 +102,7 @@ def fetch_collection(token, start=None, end=None):
         payload = json.load(resp)
     if "errors" in payload:
         raise SystemExit(f"GraphQL error: {payload['errors']}")
-    return payload["data"]["user"]["contributionsCollection"]
+    return payload["data"]["user"]["contributionsCollection"]["contributionCalendar"]
 
 
 def month_labels(weeks):
@@ -123,13 +117,14 @@ def month_labels(weeks):
     return labels
 
 
-def build_svg(calendar, command, period, theme):
-    t = {"bg": "#0d1117", "text": "#8b949e", "glow": True, **THEMES[theme]}
+def build_svg(calendar, theme):
+    t = {**THEME_DEFAULTS, **THEMES[theme]}
     weeks = calendar["weeks"]
     total = calendar["totalContributions"]
-    width = LEFT + len(weeks) * PITCH - GAP + RIGHT
+    grid_right = LEFT + len(weeks) * PITCH - GAP
     grid_bottom = TOP + 7 * PITCH - GAP
-    height = grid_bottom + 46
+    width = grid_right + RIGHT
+    height = grid_bottom + 56
     font = "ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
 
     css = [
@@ -138,6 +133,8 @@ def build_svg(calendar, command, period, theme):
         f".d{{animation:{WAVE_SECONDS}s ease-in-out infinite both;"
         "transform-box:fill-box;transform-origin:center}",
     ]
+    if t["cell_stroke"]:
+        css.append(f".d,.k{{stroke:{t['cell_stroke']};stroke-width:1}}")
     for i, (rest, peak) in enumerate(zip(t["rest"], t["peak"])):
         css.append(f".l{i}{{fill:{rest};animation-name:w{i}}}")
         css.append(
@@ -157,31 +154,38 @@ def build_svg(calendar, command, period, theme):
             cells.append(f'<rect class="d l{lvl} c{col}" x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="2"/>')
 
     months = "".join(
-        f'<text x="{LEFT + col * PITCH}" y="{TOP - 8}">{name}</text>' for col, name in month_labels(weeks)
+        f'<text x="{LEFT + col * PITCH}" y="{TOP - FRAME_PAD - 6}">{name}</text>' for col, name in month_labels(weeks)
     )
     weekdays = "".join(
-        f'<text x="{LEFT - 8}" y="{TOP + row * PITCH + CELL - 2}" text-anchor="end">{name}</text>'
+        f'<text x="{LEFT - FRAME_PAD - 6}" y="{TOP + row * PITCH + CELL - 2}" text-anchor="end">{name}</text>'
         for row, name in ((1, "Mon"), (3, "Wed"), (5, "Fri"))
     )
 
-    legend_x = width - RIGHT - 5 * PITCH + GAP - 36  # leave room for "More"
-    legend_y = grid_bottom + 20
+    frame = ""
+    if t["frame"]:
+        frame = (
+            f'<rect x="{LEFT - FRAME_PAD}" y="{TOP - FRAME_PAD}" width="{grid_right - LEFT + 2 * FRAME_PAD}" '
+            f'height="{grid_bottom - TOP + 2 * FRAME_PAD}" rx="6" fill="none" stroke="{t["frame"]}"/>'
+        )
+
+    legend_x = grid_right - 5 * PITCH + GAP - 36  # leave room for "More"
+    legend_y = grid_bottom + FRAME_PAD + 16
     legend = "".join(
-        f'<rect x="{legend_x + i * PITCH}" y="{legend_y}" width="{CELL}" height="{CELL}" rx="2" fill="{rest}"/>'
+        f'<rect class="k" x="{legend_x + i * PITCH}" y="{legend_y}" width="{CELL}" height="{CELL}" rx="2" fill="{rest}"/>'
         for i, rest in enumerate(t["rest"])
     )
     updated = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     glow = ' filter="url(#glow)"' if t["glow"] else ""
 
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-label="{total} GitHub contributions {period}">
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-label="{total} GitHub contributions in the last year">
 <style>{''.join(css)}</style>
 <defs><filter id="glow" x="-5%" y="-20%" width="110%" height="140%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<rect x="0.5" y="0.5" width="{width - 1}" height="{height - 1}" rx="10" fill="{t['bg']}" stroke="{t['border']}"/>
-<text class="title" x="{LEFT}" y="32">$ {command}</text>
-<text x="{width - RIGHT}" y="32" text-anchor="end"><tspan fill="{t['accent']}" font-weight="700">{total}</tspan> contributions {period}</text>
-{months}{weekdays}
+<rect x="1" y="1" width="{width - 2}" height="{height - 2}" rx="10" fill="{t['bg']}" stroke="{t['border']}" stroke-width="2"/>
+<text class="title" x="{LEFT - FRAME_PAD}" y="34">$ git log --since="1 year ago"</text>
+<text x="{grid_right + FRAME_PAD}" y="34" text-anchor="end"><tspan fill="{t['accent']}" font-weight="700">{total}</tspan> contributions in the last year</text>
+{months}{weekdays}{frame}
 <g{glow}>{''.join(cells)}</g>
-<text x="{LEFT}" y="{legend_y + 10}">updated {updated}</text>
+<text x="{LEFT - FRAME_PAD}" y="{legend_y + 10}">updated {updated}</text>
 <text x="{legend_x - 8}" y="{legend_y + 10}" text-anchor="end">Less</text>{legend}<text x="{legend_x + 5 * PITCH + 3}" y="{legend_y + 10}">More</text>
 </svg>
 """
@@ -193,44 +197,11 @@ def write(path, text):
     print(f"Wrote {path.relative_to(ROOT)}")
 
 
-def year_range(year):
-    end = min(datetime(year, 12, 31, 23, 59, 59, tzinfo=timezone.utc), datetime.now(timezone.utc))
-    return f"{year}-01-01T00:00:00Z", end.strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
-def readme_block(years):
-    parts = [
-        MARK_START,
-        '<div align="center">',
-        "",
-        '<img src="assets/contributions.svg" alt="GitHub contribution heatmap, last 12 months" width="100%" />',
-        "",
-    ]
-    for year in years:
-        parts += [
-            f"<details><summary><b>{year}</b></summary><br />",
-            "",
-            f'<img src="assets/contributions-{year}.svg" alt="GitHub contribution heatmap, {year}" width="100%" />',
-            "",
-            "</details>",
-        ]
-    parts += ["", "</div>", MARK_END]
-    return "\n".join(parts)
-
-
-def update_readme(years):
-    text = README.read_text(encoding="utf-8")
-    pattern = re.compile(re.escape(MARK_START) + ".*?" + re.escape(MARK_END), re.S)
-    if not pattern.search(text):
-        raise SystemExit(f"README.md is missing the {MARK_START} / {MARK_END} markers")
-    write(README, pattern.sub(lambda _: readme_block(years), text))
-
-
-def preview_page(calendar, command, period):
+def preview_page(calendar):
     """One self-contained page with every theme, for picking a colour."""
     sections = []
     for i, theme in enumerate(THEMES, 1):
-        svg = base64.b64encode(build_svg(calendar, command, period, theme).encode()).decode()
+        svg = base64.b64encode(build_svg(calendar, theme).encode()).decode()
         sections.append(
             f'<section><h2>{i} · {theme}</h2><img src="data:image/svg+xml;base64,{svg}" alt="{theme}"></section>'
         )
@@ -246,25 +217,13 @@ def main():
     token = os.environ.get("GITHUB_TOKEN")
     if not token:
         raise SystemExit("Set GITHUB_TOKEN first (locally: $env:GITHUB_TOKEN = gh auth token)")
-
-    rolling = fetch_collection(token)
-    last_year = rolling["contributionCalendar"]
-    command, period = 'git log --since="1 year ago"', "in the last year"
+    calendar = fetch_calendar(token)
 
     if "--preview" in sys.argv:
-        write(PREVIEW / "index.html", preview_page(last_year, command, period))
+        write(PREVIEW / "index.html", preview_page(calendar))
         return
 
-    theme = os.environ.get("HEATMAP_THEME", "light-blue")
-    write(ASSETS / "contributions.svg", build_svg(last_year, command, period, theme))
-
-    years = sorted(rolling["contributionYears"], reverse=True)
-    for year in years:
-        start, end = year_range(year)
-        calendar = fetch_collection(token, start, end)["contributionCalendar"]
-        year_command = f'git log --since="{year}-01-01" --until="{year}-12-31"'
-        write(ASSETS / f"contributions-{year}.svg", build_svg(calendar, year_command, f"in {year}", theme))
-    update_readme(years)
+    write(OUT, build_svg(calendar, os.environ.get("HEATMAP_THEME", "light-blue")))
 
 
 if __name__ == "__main__":
