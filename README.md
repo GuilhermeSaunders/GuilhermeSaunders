@@ -14,12 +14,13 @@
 
 ### About me
 
-I'm a Computer Science student at **CIn/UFPE** (GPA 8.75/10), currently taking Machine Learning and Statistics &
-Probability, and working on a **machine learning and data analysis project in partnership with Praso**.
+Hi! I'm **Guilherme Valença Saunders**, a Computer Science student at the **Center for Informatics (CIn)
+of the Federal University of Pernambuco (UFPE)**, in Brazil.
 
-At **CITi**, CIn/UFPE's IT consulting junior enterprise, I lead a team of **4 software engineers** on a real client
-project while staying hands-on in the code. I'm growing as a **software engineer** with depth in **AI engineering
-and machine learning**, and I'm also into **financial markets** and quantitative finance.
+I'm passionate about technology, especially **software engineering** and **artificial intelligence**, and I enjoy
+turning ideas into software that solves real problems.
+
+Feel free to explore my profile and some of my work.
 
 <br />
 
