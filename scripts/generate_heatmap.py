@@ -1,4 +1,6 @@
-"""Generate assets/contributions.svg: a contribution heatmap of the last 12 months with a wave animation.
+"""Generate the profile cards for the last 12 months:
+    assets/contributions.svg   contribution heatmap with a wave animation
+    assets/activity.svg        activity overview (commits, pull requests, issues, code review)
 
 Usage (PowerShell):
     $env:GITHUB_TOKEN = gh auth token
@@ -19,12 +21,18 @@ from pathlib import Path
 LOGIN = os.environ.get("GITHUB_USER", "GuilhermeSaunders")
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets" / "contributions.svg"
+OUT_ACTIVITY = ROOT / "assets" / "activity.svg"
 PREVIEW = ROOT / "preview"
 
 QUERY = """
 query($login: String!) {
   user(login: $login) {
     contributionsCollection {
+      totalCommitContributions
+      totalPullRequestContributions
+      totalIssueContributions
+      totalPullRequestReviewContributions
+      totalRepositoriesWithContributedCommits
       contributionCalendar {
         totalContributions
         weeks { contributionDays { date weekday contributionCount contributionLevel } }
@@ -91,7 +99,7 @@ WAVE_SECONDS = 4.5
 WAVE_STEP = 0.045  # delay between neighbouring columns
 
 
-def fetch_calendar(token):
+def fetch_collection(token):
     body = json.dumps({"query": QUERY, "variables": {"login": LOGIN}}).encode()
     req = urllib.request.Request(
         "https://api.github.com/graphql",
@@ -102,7 +110,7 @@ def fetch_calendar(token):
         payload = json.load(resp)
     if "errors" in payload:
         raise SystemExit(f"GraphQL error: {payload['errors']}")
-    return payload["data"]["user"]["contributionsCollection"]["contributionCalendar"]
+    return payload["data"]["user"]["contributionsCollection"]
 
 
 def month_labels(weeks):
@@ -191,6 +199,84 @@ def build_svg(calendar, theme):
 """
 
 
+def build_activity_svg(collection, theme):
+    """Activity overview like GitHub's: a cross with one arm per contribution type, plus bars with the counts."""
+    t = {**THEME_DEFAULTS, **THEMES[theme]}
+    width, height = 868, 300
+    font = "ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
+    stats = [  # (label, count, axis direction)
+        ("Commits", collection["totalCommitContributions"], (-1, 0)),
+        ("Pull requests", collection["totalPullRequestContributions"], (0, 1)),
+        ("Issues", collection["totalIssueContributions"], (1, 0)),
+        ("Code review", collection["totalPullRequestReviewContributions"], (0, -1)),
+    ]
+    total = sum(count for _, count, _ in stats) or 1
+    cx, cy, r = 250, 166, 70
+
+    axes, labels, dots, points = [], [], [], []
+    for label, count, (dx, dy) in stats:
+        pct = count / total
+        axes.append(f'<line x1="{cx}" y1="{cy}" x2="{cx + dx * r}" y2="{cy + dy * r}"/>')
+        px, py = cx + dx * r * pct, cy + dy * r * pct
+        points.append(f"{px:.1f},{py:.1f}")
+        if count:
+            dots.append(f'<circle class="dot" cx="{px:.1f}" cy="{py:.1f}" r="4"/>')
+        pct_text = f'<tspan class="pct">{pct:.0%}</tspan>' if count else ""
+        if dx:  # left / right: percentage above the label
+            x, anchor = cx + dx * (r + 14), "end" if dx < 0 else "start"
+            labels.append(f'<text x="{x}" y="{cy - 4}" text-anchor="{anchor}">{pct_text}</text>')
+            labels.append(f'<text x="{x}" y="{cy + 12 if count else cy + 4}" text-anchor="{anchor}">{label}</text>')
+        elif dy < 0:  # top
+            labels.append(f'<text x="{cx}" y="{cy - r - 26}" text-anchor="middle">{pct_text}</text>')
+            labels.append(f'<text x="{cx}" y="{cy - r - 12}" text-anchor="middle">{label}</text>')
+        else:  # bottom
+            labels.append(f'<text x="{cx}" y="{cy + r + 20}" text-anchor="middle">{pct_text}</text>')
+            labels.append(f'<text x="{cx}" y="{cy + r + 34}" text-anchor="middle">{label}</text>')
+
+    bar_x, bar_w = 500, 320
+    bars = []
+    for i, (label, count, _) in enumerate(stats):
+        y = 110 + i * 44
+        fill = bar_w * count / total
+        bars.append(
+            f'<text x="{bar_x}" y="{y}">{label}</text>'
+            f'<text x="{bar_x + bar_w}" y="{y}" text-anchor="end"><tspan class="pct">{count}</tspan></text>'
+            f'<rect x="{bar_x}" y="{y + 8}" width="{bar_w}" height="8" rx="4" fill="{t["rest"][0]}"/>'
+            + (f'<rect class="bar" x="{bar_x}" y="{y + 8}" width="{fill:.1f}" height="8" rx="4"/>' if count else "")
+        )
+
+    frame_stroke = t["frame"] or t["border"]
+    css = (
+        f"text{{font-family:{font};fill:{t['text']};font-size:12px}}"
+        f".title{{fill:{t['accent']};font-size:14px;font-weight:700}}"
+        f".pct{{fill:{t['accent']};font-weight:700}}"
+        f".axes line{{stroke:{t['accent']};stroke-width:2;stroke-linecap:round}}"
+        f".area{{fill:{t['rest'][2]};fill-opacity:.55;stroke:{t['accent']};stroke-width:2;stroke-linejoin:round;"
+        f"transform-origin:{cx}px {cy}px;animation:grow 1.2s cubic-bezier(.2,.8,.2,1) both}}"
+        f".dot{{fill:{t['bg']};stroke:{t['accent']};stroke-width:2;transform-box:fill-box;transform-origin:center;"
+        "animation:pulse 2.4s ease-in-out 1.2s infinite}"
+        f".bar{{fill:{t['accent']};transform-box:fill-box;transform-origin:left;animation:fill 1.2s cubic-bezier(.2,.8,.2,1) both}}"
+        "@keyframes grow{from{transform:scale(0)}to{transform:scale(1)}}"
+        "@keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}"
+        "@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}"
+        "@media (prefers-reduced-motion:reduce){.area,.dot,.bar{animation:none}}"
+    )
+    repos = collection["totalRepositoriesWithContributedCommits"]
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-label="Activity overview: {', '.join(f'{c} {l.lower()}' for l, c, _ in stats)}">
+<style>{css}</style>
+<rect x="1" y="1" width="{width - 2}" height="{height - 2}" rx="10" fill="{t['bg']}" stroke="{t['border']}" stroke-width="2"/>
+<text class="title" x="41" y="34">$ git shortlog --summary --since="1 year ago"</text>
+<text x="827" y="34" text-anchor="end"><tspan class="pct">{repos}</tspan> repositories contributed to</text>
+<rect x="41" y="52" width="786" height="{height - 72}" rx="6" fill="none" stroke="{frame_stroke}"/>
+<line x1="460" y1="70" x2="460" y2="{height - 38}" stroke="{frame_stroke}"/>
+<g class="axes">{''.join(axes)}</g>
+<polygon class="area" points="{' '.join(points)}"/>
+{''.join(dots)}{''.join(labels)}{''.join(bars)}
+</svg>
+"""
+
+
 def write(path, text):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8", newline="\n")
@@ -217,13 +303,16 @@ def main():
     token = os.environ.get("GITHUB_TOKEN")
     if not token:
         raise SystemExit("Set GITHUB_TOKEN first (locally: $env:GITHUB_TOKEN = gh auth token)")
-    calendar = fetch_calendar(token)
+    collection = fetch_collection(token)
+    calendar = collection["contributionCalendar"]
 
     if "--preview" in sys.argv:
         write(PREVIEW / "index.html", preview_page(calendar))
         return
 
-    write(OUT, build_svg(calendar, os.environ.get("HEATMAP_THEME", "light-blue")))
+    theme = os.environ.get("HEATMAP_THEME", "light-blue")
+    write(OUT, build_svg(calendar, theme))
+    write(OUT_ACTIVITY, build_activity_svg(collection, theme))
 
 
 if __name__ == "__main__":

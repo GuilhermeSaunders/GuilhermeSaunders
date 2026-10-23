@@ -4,8 +4,10 @@
 
 **Software Engineer · AI & Machine Learning · Computer Science @ UFPE**
 
-<a href="https://www.linkedin.com/in/YOUR-LINKEDIN"><img src="https://img.shields.io/badge/LinkedIn-0969da?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>
-<a href="mailto:YOUR-EMAIL"><img src="https://img.shields.io/badge/Email-0969da?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
+<a href="https://www.linkedin.com/in/guilherme-saunders-b25040368"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI%2BPHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0yMC40NDcgMjAuNDUyaC0zLjU1NHYtNS41NjljMC0xLjMyOC0uMDI3LTMuMDM3LTEuODUyLTMuMDM3LTEuODUzIDAtMi4xMzYgMS40NDUtMi4xMzYgMi45Mzl2NS42NjdIOS4zNTFWOWgzLjQxNHYxLjU2MWguMDQ2Yy40NzctLjkgMS42MzctMS44NSAzLjM3LTEuODUgMy42MDEgMCA0LjI2NyAyLjM3IDQuMjY3IDUuNDU1djYuMjg2ek01LjMzNyA3LjQzM2MtMS4xNDQgMC0yLjA2My0uOTI2LTIuMDYzLTIuMDY1IDAtMS4xMzguOTItMi4wNjMgMi4wNjMtMi4wNjMgMS4xNCAwIDIuMDY0LjkyNSAyLjA2NCAyLjA2MyAwIDEuMTM5LS45MjUgMi4wNjUtMi4wNjQgMi4wNjV6bTEuNzgyIDEzLjAxOUgzLjU1NVY5aDMuNTY0djExLjQ1MnpNMjIuMjI1IDBIMS43NzFDLjc5MiAwIDAgLjc3NCAwIDEuNzI5djIwLjU0MkMwIDIzLjIyNy43OTIgMjQgMS43NzEgMjRoMjAuNDUxQzIzLjIgMjQgMjQgMjMuMjI3IDI0IDIyLjI3MVYxLjcyOUMyNCAuNzc0IDIzLjIgMCAyMi4yMjIgMGguMDAzeiIvPjwvc3ZnPg%3D%3D" alt="LinkedIn" /></a>
+<a href="mailto:guilhermevalenca.s7@gmail.com"><img src="https://img.shields.io/badge/Gmail-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail" /></a>
+<!-- resume: enabled once resume.pdf is in the repo -->
+<!--<a href="https://github.com/GuilhermeSaunders/GuilhermeSaunders/blob/main/resume.pdf"><img src="https://img.shields.io/badge/Resume-24292F?style=for-the-badge&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xNCAySDZhMiAyIDAgMCAwLTIgMnYxNmEyIDIgMCAwIDAgMiAyaDEyYTIgMiAwIDAgMCAyLTJWOHoiLz48cGF0aCBkPSJNMTQgMnY2aDYiLz48cGF0aCBkPSJNOCAxM2g4TTggMTdoOE04IDloMiIvPjwvc3ZnPg%3D%3D" alt="Resume" /></a>-->
 
 </div>
 
@@ -13,20 +15,31 @@
 
 ### About me
 
-I'm a Computer Science student at the **Federal University of Pernambuco (UFPE)** and **Software Manager at CITi**,
-the junior enterprise of UFPE's Informatics Center. My day-to-day sits between writing code and making sure
-software projects get delivered to real clients, on time and with quality.
+I'm a Computer Science student at **CIn/UFPE** (GPA 8.75/10), currently taking Machine Learning and Statistics &
+Probability, and working on a **machine learning and data analysis project in partnership with Praso**.
 
-I'm focused on growing as a **software engineer** with depth in **AI engineering and machine learning**:
-building systems that are reliable in production, not just in a notebook. On the side, I'm interested in
-**quantitative finance** and how data-driven models are used to make decisions.
+At **CITi**, CIn/UFPE's IT consulting junior enterprise, I lead a team of **4 software engineers** on a real client
+project while staying hands-on in the code. I'm growing as a **software engineer** with depth in **AI engineering
+and machine learning**, and I'm also into **financial markets** and quantitative finance.
 
 ### Experience
 
-**Software Manager · CITi** (UFPE Informatics Center junior enterprise)
+**Software Manager · CITi** — Jul 2026 – Present
 
-- Coordinate the software team and the delivery of client projects, from scoping to release
-- Bridge technical decisions and client needs, keeping scope, deadlines and code quality aligned
+- Selected through an internal process to lead a client project as the main point of contact, managing 4 software engineers
+- Translate business requirements into technical deliverables while keeping hands-on technical work alongside management
+
+**Software Engineer & Technical Advisor · CITi Innovation Lab** — Jan 2026 – Jun 2026
+
+- Built features for 2 client projects with Node.js, TypeScript, PostgreSQL and Prisma ORM, including the data persistence and query layer
+- Volunteered as Technical Advisor to research technologies and best practices, and proposed internal training tracks (Anthropic Academy, Rocketseat)
+
+**Developer & Researcher · L.E.I. Extension Lab, CIn/UFPE** — 2026 – Present
+
+- Develop a platform connecting the university, government and NGOs, and write a scientific paper about the project
+- Run interviews, surveys and requirements gathering with students, NGOs and government stakeholders
+
+**Teaching Assistant · Object-Oriented Data Structures, CIn/UFPE** — 2026.1
 
 <br />
 
@@ -34,10 +47,12 @@ building systems that are reliable in production, not just in a notebook. On the
 
 <img src="assets/contributions.svg" alt="GitHub contribution heatmap, last 12 months" width="100%" />
 
+<img src="assets/activity.svg" alt="Activity overview: commits, pull requests, issues and code review" width="100%" />
+
 </div>
 
 ### Stack
 
 <p>
-  <img src="https://skillicons.dev/icons?i=python,ts,nodejs,postgres,docker,git,linux" alt="Python, TypeScript, Node.js, PostgreSQL, Docker, Git, Linux" />
+  <img src="https://skillicons.dev/icons?i=python,sklearn,ts,js,nodejs,prisma,postgres,cpp,docker,git,linux" alt="Python, scikit-learn, TypeScript, JavaScript, Node.js, Prisma, PostgreSQL, C++, Docker, Git, Linux" />
 </p>
