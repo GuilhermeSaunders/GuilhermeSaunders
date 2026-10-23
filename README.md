@@ -21,25 +21,6 @@ At **CITi**, CIn/UFPE's IT consulting junior enterprise, I lead a team of **4 so
 project while staying hands-on in the code. I'm growing as a **software engineer** with depth in **AI engineering
 and machine learning**, and I'm also into **financial markets** and quantitative finance.
 
-### Experience
-
-**Software Manager · CITi** — Jul 2026 – Present
-
-- Selected through an internal process to lead a client project as the main point of contact, managing 4 software engineers
-- Translate business requirements into technical deliverables while keeping hands-on technical work alongside management
-
-**Software Engineer & Technical Advisor · CITi Innovation Lab** — Jan 2026 – Jun 2026
-
-- Built features for 2 client projects with Node.js, TypeScript, PostgreSQL and Prisma ORM, including the data persistence and query layer
-- Volunteered as Technical Advisor to research technologies and best practices, and proposed internal training tracks (Anthropic Academy, Rocketseat)
-
-**Developer & Researcher · L.E.I. Extension Lab, CIn/UFPE** — 2026 – Present
-
-- Develop a platform connecting the university, government and NGOs, and write a scientific paper about the project
-- Run interviews, surveys and requirements gathering with students, NGOs and government stakeholders
-
-**Teaching Assistant · Object-Oriented Data Structures, CIn/UFPE** — 2026.1
-
 <br />
 
 <div align="center">
