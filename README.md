@@ -26,7 +26,7 @@ Feel free to explore my profile and some of my work.
 
 <div align="center">
 
-<img src="assets/contributions.svg?v=9a9f64cc" alt="GitHub contribution heatmap, last 12 months" width="100%" />
+<img src="assets/contributions.svg?v=f3c5709e" alt="GitHub contribution heatmap, last 12 months" width="100%" />
 
 <br />
 <br />
